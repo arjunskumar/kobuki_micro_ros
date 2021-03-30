@@ -219,6 +219,8 @@ Then, depending on the selected transport and RTOS, the board connection to the 
     
 * For USB-SERIAL communication - Use onboard USB-OTG2 port to connect
 
+![usb_ttl_olimex](/img/usb_ttl_olimex.png)
+
 ## Running the micro-ROS Agent
 
 To give micro-ROS access to the ROS 2 dataspace, you just need to run the agent:
