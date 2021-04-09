@@ -8,6 +8,8 @@ Hardware Requirements
 * [usb-to-ttl converter](https://www.electronicscomp.com/cp2102-usb-to-ttl-serial-converter-module)
 
 # ROS2 Installation
+<details>
+<summary> click to expand </summary>
 ## Setup Locale
 
 ```
@@ -47,7 +49,13 @@ ros2 run demo_nodes_py listener
 ![ros2_output](img/ros2_output1.png
 )
 
+</details>
+
+
 # Micro ROS Installation
+
+<details>
+<summary> click to expand </summary>
 
 ## Update dependencies using rosdep
 
@@ -86,8 +94,12 @@ The build system’s workflow is a four-step procedure:
 
 * Flash step: The binaries generated in the previous step are flashed onto the hardware platform memory, in order to allow the execution of the micro-ROS app.
 
+</details>
 
 # olimex-stm32-e407 Board configuration 
+
+<details>
+<summary> click to expand </summary>
 
 ![olimex_board_layout_front](img/olimex_board_layout_front.png
 )
@@ -249,3 +261,4 @@ ros2 topic list
 
 ![micro_ros_topic](img/micro_ros_topic.png
 )
+</details>
