@@ -265,6 +265,9 @@ ros2 topic list
 
 # Teleoperation of Kobuki using MicroROS
 
+<details>
+<summary> click to expand </summary>
+
 The example is wrtten for olimex STM32E407 board on freeRTOS platform
 
 Clone the file ```kobuki_new``` package to the directory ```/firmware/freertos_apps/apps```
@@ -442,3 +445,4 @@ Kobuki base serial pin layout shown below
 
 ![hardware_kobuki2](img/hardware_kobuki2.jpg
 )
+</details>
