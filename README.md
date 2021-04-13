@@ -264,3 +264,173 @@ ros2 topic list
 </details>
 
 # Teleoperation of Kobuki using MicroROS
+
+The example is wrtten for olimex STM32E407 board on freeRTOS platform
+
+Clone the file ```kobuki_new``` package to the directory ```/firmware/freertos_apps/apps```
+
+![app_directory](img/app_directory.png
+)
+
+## Configure the firmware
+ Here the example is out of the box ready for wireless teleoperation
+ 
+ Since the Olimex board does not have in-build wifi facility connect a external wifi modem to the ethernet port of the dev board. The power supply to the wifi modem has to carried out seprately.
+
+ Run the comand 
+
+ ```
+ ros2 run micro_ros_setup configure_firmware.sh kobuki_new -t udp -i <ip-address> -p 8888
+ ```
+Replace ```ip-address``` with the ip address of the wifi modem. Use ```ifconfig``` to obtain the ip address.
+
+![config_kobuki](img/config_kobuki.png
+)
+
+## Building and flashing the firmware
+
+### Building the firmware
+
+Run the comand 
+```
+ros2 run micro_ros_setup build_firmware.sh
+```
+### Flashing the firmware
+
+Run the comand
+```
+openocd -f ./interface/jlink.cfg -f ./target/stm32f4x.cfg -c init -c "reset halt" -c "flash write_image erase <path to the microros.elf file >" -c "reset" -c "exit"
+```
+Locate the .elf file generated in the previous step and replace the path in the above comand.
+
+![flash_kobuki](img/flash_kobuki.png
+)
+
+## Runing the microROS agent
+
+Now the firmware is flashed in to the board and ready to connect with the microROS agent in your laptop.
+
+### Setting up the microROS agent 
+
+```
+ros2 run micro_ros_setup create_agent_ws.sh
+```
+Building the agent work space
+```
+ros2 run micro_ros_setup build_agent.sh
+```
+and source the setup with 
+```
+source install/setup.bash
+```
+
+### Launching the microROS agent
+
+Run the comand 
+
+```
+ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888 -v6
+```
+This will give the following output
+```
+[1617964653.490785] info     | UDPv4AgentLinux.cpp | init                     | running...             | port: 8888
+[1617964653.491030] info     | Root.cpp           | set_verbose_level        | logger setup           | verbose_level: 6
+[1617964671.398739] debug    | UDPv4AgentLinux.cpp | recv_message             | [==>> UDP <<==]        | client_key: 0x00000000, len: 24, data: 
+0000: 80 00 00 00 00 01 10 00 58 52 43 45 01 00 01 0F 15 B5 CC 50 81 00 FC 01
+[1617964671.399073] info     | Root.cpp           | create_client            | create                 | client_key: 0x15B5CC50, session_id: 0x81
+[1617964671.399213] info     | SessionManager.hpp | establish_session        | session established    | client_key: 0x364235856, address: 192.168.0.104:448
+[1617964671.399464] debug    | UDPv4AgentLinux.cpp | send_message             | [** <<UDP>> **]        | client_key: 0x15B5CC50, len: 19, data: 
+0000: 81 00 00 00 04 01 0B 00 00 00 58 52 43 45 01 00 01 0F 00
+[1617964671.403259] debug    | UDPv4AgentLinux.cpp | recv_message             | [==>> UDP <<==]        | client_key: 0x15B5CC50, len: 104, data: 
+0000: 81 80 00 00 01 05 5E 00 00 0A 00 01 01 02 00 00 50 00 00 00 3C 64 64 73 3E 3C 70 61 72 74 69 63
+0020: 69 70 61 6E 74 3E 3C 72 74 70 73 3E 3C 6E 61 6D 65 3E 4D 69 63 72 6F 52 4F 53 5F 6B 6F 62 75 6B
+0040: 69 3C 2F 6E 61 6D 65 3E 3C 2F 72 74 70 73 3E 3C 2F 70 61 72 74 69 63 69 70 61 6E 74 3E 3C 2F 64
+0060: 64 73 3E 00 00 00 00 00
+[1617964671.403353] debug    | UDPv4AgentLinux.cpp | recv_message             | [==>> UDP <<==]        | client_key: 0x15B5CC50, len: 13, data: 
+0000: 81 00 00 00 0B 01 05 00 00 00 00 00 80
+[1617964671.406590] debug    | UDPv4AgentLinux.cpp | recv_message             | [==>> UDP <<==]        | client_key: 0x15B5CC50, len: 13, data: 
+0000: 81 00 00 00 0B 01 05 00 00 00 00 00 80
+[1617964671.409265] debug    | UDPv4AgentLinux.cpp | recv_message             | [==>> UDP <<==]        | client_key: 0x15B5CC50, len: 13, data: 
+0000: 81 00 00 00 0B 01 05 00 00 00 00 00 80
+[1617964671.410349] debug    | ProxyClient.cpp    | create_participant       | participant created    | client_key: 0x15B5CC50, participant_id: 0x000(1)
+[1617964671.410513] debug    | UDPv4AgentLinux.cpp | send_message             | [** <<UDP>> **]        | client_key: 0x15B5CC50, len: 14, data: 
+0000: 81 80 00 00 05 01 06 00 00 0A 00 01 00 00
+[1617964671.411029] debug    | UDPv4AgentLinux.cpp | send_message             | [** <<UDP>> **]        | client_key: 0x15B5CC50, len: 13, data: 
+0000: 81 00 00 00 0A 01 05 00 01 00 00 00 80
+[1617964671.411097] debug    | UDPv4AgentLinux.cpp | send_message             | [** <<UDP>> **]        | client_key: 0x15B5CC50, len: 13, data: 
+0000: 81 00 00 00 0A 01 05 00 01 00 00 00 80
+[1617964671.411158] debug    | UDPv4AgentLinux.cpp | send_message             | [** <<UDP>> **]        | client_key: 0x15B5CC50, len: 13, data: 
+0000: 81 00 00 00 0A 01 05 00 01 00 00 00 80
+[1617964671.411193] debug    | UDPv4AgentLinux.cpp | send_message             | [** <<UDP>> **]        | client_key: 0x15B5CC50, len: 13, data: 
+0000: 81 00 00 00 0A 01 05 00 01 00 00 00 80
+[1617964671.418825] debug    | UDPv4AgentLinux.cpp | recv_message             | [==>> UDP <<==]        | client_key: 0x15B5CC50, len: 13, data: 
+0000: 81 00 00 00 0A 01 05 00 01 00 00 00 80
+[1617964671.418868] debug    | UDPv4AgentLinux.cpp | recv_message             | [==>> UDP <<==]        | client_key: 0x15B5CC50, len: 128, data: 
+0000: 81 80 01 00 01 05 75 00 00 0B 00 02 02 02 00 00 67 00 00 00 3C 64 64 73 3E 3C 74 6F 70 69 63 3E
+0020: 3C 6E 61 6D 65 3E 72 74 2F 63 6D 64 5F 76 65 6C 3C 2F 6E 61 6D 65 3E 3C 64 61 74 61 54 79 70 65
+0040: 3E 67 65 6F 6D 65 74 72 79 5F 6D 73 67 73 3A 3A 6D 73 67 3A 3A 64 64 73 5F 3A 3A 54 77 69 73 74
+0060: 5F 3C 2F 64 61 74 61 54 79 70 65 3E 3C 2F 74 6F 70 69 63 3E 3C 2F 64 64 73 3E 00 00 01 00 00 00
+[1617964671.418900] debug    | UDPv4AgentLinux.cpp | recv_message             | [==>> UDP <<==]        | client_key: 0x15B5CC50, len: 13, data: 
+0000: 81 00 00 00 0B 01 05 00 01 00 01 00 80
+[1617964671.418911] debug    | UDPv4AgentLinux.cpp | recv_message             | [==>> UDP <<==]        | client_key: 0x15B5CC50, len: 13, data: 
+0000: 81 00 00 00 0B 01 05 00 01 00 01 00 80
+[1617964671.419126] debug    | ProxyClient.cpp    | create_topic             | topic created          | client_key: 0x15B5CC50, topic_id: 0x000(2), participant_id: 0x000(1)
+[1617964671.419209] debug    | UDPv4AgentLinux.cpp | send_message             | [** <<UDP>> **]        | client_key: 0x15B5CC50, len: 14, data: 
+0000: 81 80 01 00 05 01 06 00 00 0B 00 02 00 00
+[1617964671.419234] debug    | UDPv4AgentLinux.cpp | send_message             | [** <<UDP>> **]        | client_key: 0x15B5CC50, len: 13, data: 
+0000: 81 00 00 00 0A 01 05 00 02 00 00 00 80
+[1617964671.419246] debug    | UDPv4AgentLinux.cpp | send_message             | [** <<UDP>> **]        | client_key: 0x15B5CC50, len: 13, data: 
+0000: 81 00 00 00 0A 01 05 00 02 00 00 00 80
+[1617964671.419256] debug    | UDPv4AgentLinux.cpp | send_message             | [** <<UDP>> **]        | client_key: 0x15B5CC50, len: 13, data: 
+0000: 81 00 00 00 0A 01 05 00 02 00 00 00 80
+[1617964671.452049] debug    | UDPv4AgentLinux.cpp | recv_message             | [==>> UDP <<==]        | client_key: 0x15B5CC50, len: 13, data: 
+0000: 81 00 00 00 0B 01 05 00 01 00 01 00 80
+[1617964671.452125] debug    | UDPv4AgentLinux.cpp | recv_message             | [==>> UDP <<==]        | client_key: 0x15B5CC50, len: 13, data: 
+0000: 81 00 00 00 0A 01 05 00 02 00 00 00 80
+[1617964671.452158] debug    | UDPv4AgentLinux.cpp | recv_message             | [==>> UDP <<==]        | client_key: 0x15B5CC50, len: 24, data: 
+0000: 81 80 02 00 01 05 0F 00 00 0C 00 04 04 02 00 00 01 00 00 00 00 00 01 00
+[1617964671.452192] debug    | UDPv4AgentLinux.cpp | recv_message             | [==>> UDP <<==]        | client_key: 0x15B5CC50, len: 13, data: 
+0000: 81 00 00 00 0B 01 05 00 02 00 02 00 80
+[1617964671.452228] debug    | UDPv4AgentLinux.cpp | recv_message             | [==>> UDP <<==]        | client_key: 0x15B5CC50, len: 13, data: 
+0000: 81 00 00 00 0B 01 05 00 02 00 02 00 80
+[1617964671.452258] debug    | UDPv4AgentLinux.cpp | recv_message             | [==>> UDP <<==]        | client_key: 0x15B5CC50, len: 13, data: 
+0000: 81 00 00 00 0B 01 05 00 02 00 02 00 80
+[1617964671.452297] debug    | UDPv4AgentLinux.cpp | recv_message             | [==>> UDP <<==]        | client_key: 0x15B5CC50, len: 13, data: 
+0000: 81 00 00 00 0B 01 05 00 02 00 02 00 80
+[1617964671.452315] debug    | UDPv4AgentLinux.cpp | send_message             | [** <<UDP>> **]        | client_key: 0x15B5CC50, len: 13, data: 
+0000: 81 00 00 00 0A 01 05 00 02 00 00 00 80
+[1617964671.452451] debug    | ProxyClient.cpp    | create_subscriber        | subscriber created     | client_key: 0x15B5CC50, subscriber_id: 0x000(4), participant_id: 0x000(1)
+[1617964671.452570] debug    | UDPv4AgentLinux.cpp | send_message             | [** <<UDP>> **]        | client_key: 0x15B5CC50, len: 14, data: 
+0000: 81 80 02 00 05 01 06 00 00 0C 00 04 00 00
+```
+
+Some cases the connection is not initiated on the go, in that case press the on board reset button.
+
+To check whether the /cmd_vel topic is activated, open another tab in the terminal and source ```install/setup.bash```
+
+Run the comand 
+
+```
+ros2 topic list
+```
+/cmd_vel topic will be present 
+
+## Launch the turtlebot teleop node
+
+Run the comand 
+```
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+```
+It will launch the teleop control node
+
+![teleop_kobuki](img/teleop_kobuki.png
+)
+
+Now control is enabled with respective control keyboard switchs
+
+## Hardware setup
+
+![hardware_kobuki1](img/hardware_kobuki1.jpg
+)
+![hardware_kobuki2](img/hardware_kobuki2.jpg
+)
