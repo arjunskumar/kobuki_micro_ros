@@ -430,7 +430,15 @@ Now control is enabled with respective control keyboard switchs
 
 ## Hardware setup
 
+The control signals to the kobuki base is send forn the UART3 of the olimex board which located near the boot jumpers. The functionality of each pin given in the back side of the board. Connect the ground and Tx pin to the ground and Rx pin of the kobuki base using jumper wires.
+
+Kobuki base serial pin layout shown below
+
+![pin_kobuki](img/pin_kobuki.png
+)
+
 ![hardware_kobuki1](img/hardware_kobuki1.jpg
 )
+
 ![hardware_kobuki2](img/hardware_kobuki2.jpg
 )
